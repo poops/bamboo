@@ -4,7 +4,7 @@ defmodule Bamboo.MailerTest do
 
   defmodule FooAdapter do
     def deliver(email, config) do
-      send(:mailer_test, {:deliver, email, config})
+      send :mailer_test, {:deliver, email, config}
     end
 
     def handle_config(config), do: config
@@ -14,7 +14,7 @@ defmodule Bamboo.MailerTest do
 
   defmodule CustomConfigAdapter do
     def deliver(email, config) do
-      send(:mailer_test, {:deliver, email, config})
+      send :mailer_test, {:deliver, email, config}
     end
 
     def handle_config(config) do
@@ -116,11 +116,8 @@ defmodule Bamboo.MailerTest do
     {:deliver, returned_email, config} = FooMailer.deliver_now(email)
 
     assert returned_email == Bamboo.Mailer.normalize_addresses(email)
-
-    config_with_default_strategy =
-      Enum.into(@mailer_config, %{})
+    config_with_default_strategy = Enum.into(@mailer_config, %{})
       |> Map.put(:deliver_later_strategy, Bamboo.TaskSupervisorStrategy)
-
     assert config == config_with_default_strategy
   end
 

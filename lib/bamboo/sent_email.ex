@@ -26,7 +26,6 @@ defmodule Bamboo.SentEmail do
 
       For example: SentEmail.all |> List.first
       """
-
       %DeliveriesError{message: message}
     end
 
@@ -71,7 +70,7 @@ defmodule Bamboo.SentEmail do
   end
 
   def get_id(email) do
-    raise "SentEmail.get_id/1 expected a %Bamboo.Email{}, instead got: #{inspect(email)}"
+    raise "SentEmail.get_id/1 expected a %Bamboo.Email{}, instead got: #{inspect email}"
   end
 
   @doc """
@@ -89,14 +88,14 @@ defmodule Bamboo.SentEmail do
   end
 
   defp do_get(id) do
-    Enum.find(all(), nil, fn email ->
-      email |> get_id |> String.downcase() == String.downcase(id)
-    end)
+    Enum.find all(), nil, fn(email) ->
+      email |> get_id |> String.downcase == String.downcase(id)
+    end
   end
 
   @doc "Returns a list of all sent emails"
   def all do
-    Agent.get(__MODULE__, fn emails -> emails end)
+    Agent.get(__MODULE__, fn(emails) -> emails end)
   end
 
   @doc """
@@ -107,11 +106,9 @@ defmodule Bamboo.SentEmail do
   """
   def push(email) do
     email = put_rand_id(email)
-
-    Agent.update(__MODULE__, fn emails ->
+    Agent.update(__MODULE__, fn(emails) ->
       [email | emails]
     end)
-
     email
   end
 
@@ -121,7 +118,7 @@ defmodule Bamboo.SentEmail do
 
   defp rand_id do
     :crypto.strong_rand_bytes(@id_length)
-    |> Base.url_encode64()
+    |> Base.url_encode64
     |> binary_part(0, @id_length)
   end
 
@@ -141,7 +138,7 @@ defmodule Bamboo.SentEmail do
 
   @doc "Clears all sent emails"
   def reset do
-    Agent.update(__MODULE__, fn _ ->
+    Agent.update(__MODULE__, fn(_) ->
       []
     end)
   end

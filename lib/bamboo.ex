@@ -23,9 +23,8 @@ defmodule Bamboo do
       message = """
       All recipients were set to nil. Must specify at least one recipient.
 
-      Full email - #{inspect(email, limit: :infinity)}
+      Full email - #{inspect email, limit: :infinity}
       """
-
       %NilRecipientsError{message: message}
     end
   end
@@ -35,7 +34,7 @@ defmodule Bamboo do
 
     children = [
       worker(Bamboo.SentEmail, []),
-      supervisor(Task.Supervisor, [[name: Bamboo.TaskSupervisorStrategy.supervisor_name()]])
+      supervisor(Task.Supervisor, [[name: Bamboo.TaskSupervisorStrategy.supervisor_name]])
     ]
 
     opts = [strategy: :one_for_one, name: Bamboo.Supervisor]

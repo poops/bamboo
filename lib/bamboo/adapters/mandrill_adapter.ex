@@ -26,15 +26,14 @@ defmodule Bamboo.MandrillAdapter do
 
   def deliver(email, config) do
     api_key = get_key(config)
-    params = email |> convert_to_mandrill_params(api_key) |> Poison.encode!()
+    params = email |> convert_to_mandrill_params(api_key) |> Poison.encode!
     uri = [base_uri(), "/", api_path(email)]
 
     case :hackney.post(uri, headers(), params, [:with_body]) do
       {:ok, status, headers, response} ->
         {:ok, %{status_code: status, headers: headers, body: response}}
 
-      resp ->
-        resp
+      resp -> resp
     end
   end
 
@@ -63,7 +62,7 @@ defmodule Bamboo.MandrillAdapter do
 
     * Here are the config options that were passed in:
 
-    #{inspect(config)}
+    #{inspect config}
     """
   end
 
@@ -72,14 +71,11 @@ defmodule Bamboo.MandrillAdapter do
     |> maybe_put_template_params(email)
   end
 
-  defp maybe_put_template_params(params, %{
-         private: %{template_name: template_name, template_content: template_content}
-       }) do
+  defp maybe_put_template_params(params, %{private: %{template_name: template_name, template_content: template_content}}) do
     params
     |> Map.put(:template_name, template_name)
     |> Map.put(:template_content, template_content)
   end
-
   defp maybe_put_template_params(params, _), do: params
 
   defp message_params(email) do
@@ -97,17 +93,16 @@ defmodule Bamboo.MandrillAdapter do
   end
 
   defp add_message_params(mandrill_message, %{private: %{message_params: message_params}}) do
-    Enum.reduce(message_params, mandrill_message, fn {key, value}, mandrill_message ->
+    Enum.reduce(message_params, mandrill_message, fn({key, value}, mandrill_message) ->
       Map.put(mandrill_message, key, value)
     end)
   end
-
   defp add_message_params(mandrill_message, _), do: mandrill_message
 
   defp attachments(%{attachments: attachments}) do
     attachments
-    |> Enum.reverse()
-    |> Enum.map(fn attachment ->
+    |> Enum.reverse
+    |> Enum.map(fn(attachment) ->
       %{
         name: attachment.filename,
         type: attachment.content_type,
@@ -124,15 +119,12 @@ defmodule Bamboo.MandrillAdapter do
   end
 
   defp add_recipients(recipients, new_recipients, type: recipient_type) do
-    Enum.reduce(new_recipients, recipients, fn recipient, recipients ->
-      recipients ++
-        [
-          %{
-            name: recipient |> elem(0),
-            email: recipient |> elem(1),
-            type: recipient_type
-          }
-        ]
+    Enum.reduce(new_recipients, recipients, fn(recipient, recipients) ->
+      recipients ++ [%{
+        name: recipient |> elem(0),
+        email: recipient |> elem(1),
+        type: recipient_type
+      }]
     end)
   end
 
